@@ -14,11 +14,13 @@ const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true
 
 var collection;
 
-server.listen("3000", async() => {
+var port = process.env.PORT || 3000;
+
+server.listen(port, async() => {
     try {
         await client.connect();
         collection = client.db("computron").collection("users");
-        console.log("Listening at :3000...");
+        console.log("Listening at :" + port + "...");
     } catch (e) {
         console.error(e);
     }
