@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const { MongoClient, ObjectID } = require("mongodb");
 const Express = require("express");
 const BodyParser = require('body-parser');
