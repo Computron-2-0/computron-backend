@@ -10,7 +10,7 @@ server.use(BodyParser.urlencoded({ extended: true }));
 server.use(cors());
 
 console.log(process.env);
-const client = new MongoClient(process.env.ATLAS_URI);
+const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
 
 var collection;
 
