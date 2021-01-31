@@ -3,11 +3,13 @@ require("dotenv").config();
 const { MongoClient, ObjectID } = require("mongodb");
 const Express = require("express");
 const BodyParser = require('body-parser');
+const cors = require("cors");
 
 const server = Express();
 
 server.use(BodyParser.json());
 server.use(BodyParser.urlencoded({ extended: true }));
+server.use(cors());
 
 console.log(process.env);
 const client = new MongoClient(process.env.ATLAS_URI);
