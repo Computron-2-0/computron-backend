@@ -3,8 +3,8 @@ const server = Express.Router();
 const { MongoClient, ObjectID } = require("mongodb");
 
 server.post("/", async(request, response) => {
+    const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
     try {
-        const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
         await client.connect();
         var collection = client.db("computron").collection("users");
 
@@ -36,6 +36,8 @@ server.post("/", async(request, response) => {
                 message: "Welcome back, " + result.user + "!"
             });
         }
+
+        client.close();
     } catch (e) {
         console.log(e);
         response.status(500).send({

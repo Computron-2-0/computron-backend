@@ -3,8 +3,8 @@ const server = Express.Router();
 const { MongoClient, ObjectID } = require("mongodb");
 
 server.post("/", async(request, response) => {
+    const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
     try {
-        const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
         await client.connect();
         var collection = client.db("computron").collection("users");
 
@@ -19,7 +19,8 @@ server.post("/", async(request, response) => {
                 "user": request.body.username,
                 "pass": request.body.password,
                 "email": request.body.email,
-                "date_created": date.toJSON()
+                "date_created": date.toJSON(),
+                "last_login_date": date.toJSON()
             });
     
             if (insertResult == null) {
@@ -39,6 +40,8 @@ server.post("/", async(request, response) => {
                     message: "Welcome, " + insertCheck.user + "!"
                 });
             }
+
+            client.close();
         } else {
             //Return error if user is already found.
             response.send({
