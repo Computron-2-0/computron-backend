@@ -52,7 +52,7 @@ server.post("/signup", async(request, response) => {
         var insertCheck = await collection.findOne({
           "user": request.body.username
         });
-        console.log("Return result:\n" + insertCheck);
+        console.log("Return result:\n" + JSON.stringify(insertCheck));
         response.send({
           result: insertCheck,
           error: false,
@@ -100,7 +100,7 @@ server.post("/signin", async(request, response) => {
           "last_login_date": date.toJSON()
         }
       });
-      console.log("Return data:\n" + result);
+      console.log("Return data:\n" + JSON.stringify(result));
       response.send({
         result: result,
         error: false,
