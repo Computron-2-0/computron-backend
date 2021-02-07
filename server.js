@@ -56,7 +56,7 @@ server.post("/signup", async(request, response) => {
         response.send({
           result: insertCheck,
           error: false,
-          message: "Welcome, " + request.body.username + "!"
+          message: "Welcome, " + insertCheck.user + "!"
         });
       }
     } else {
@@ -68,6 +68,7 @@ server.post("/signup", async(request, response) => {
       })
     }
   } catch (e) {
+    console.log(e);
     response.status(500).send({
       result: null,
       error: true,
@@ -90,6 +91,13 @@ server.post("/signin", async(request, response) => {
         message: "Invalid username or password"
       });
     } else {
+      //Update last login date with current date before sending return result.
+      var date = new Date(Date.now());
+      var updateLoginDate = await collection.updateOne({
+        "_id": result._id
+      }, {
+        "last_login_date": date.toJSON()
+      });
       console.log("Return data:\n" + result);
       response.send({
         result: result,
@@ -98,6 +106,7 @@ server.post("/signin", async(request, response) => {
       });
     }
   } catch (e) {
+    console.log(e);
     response.status(500).send({
       result: null,
       error: true,
