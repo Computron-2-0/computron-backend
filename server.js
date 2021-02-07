@@ -96,7 +96,9 @@ server.post("/signin", async(request, response) => {
       var updateLoginDate = await collection.updateOne({
         "_id": result._id
       }, {
-        "last_login_date": date.toJSON()
+        "$set": {
+          "last_login_date": date.toJSON()
+        }
       });
       console.log("Return data:\n" + result);
       response.send({
