@@ -83,19 +83,20 @@ server.post("/signin", async(request, response) => {
       "user": request.body.username,
       "pass": request.body.password
     });
-    if (result == null)
+    if (result == null) {
       response.send({
         result: null,
         error: true,
         message: "Invalid username or password"
       });
-    else
+    } else {
       console.log("Return data:\n" + result);
       response.send({
         result: result,
         error: false,
         message: "Welcome back, " + result.user + "!"
       });
+    }
   } catch (e) {
     response.status(500).send({
       result: null,
