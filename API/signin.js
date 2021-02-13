@@ -14,7 +14,7 @@ server.post("/", async(request, response) => {
             "pass": request.body.password
         });
         if (result == null) {
-            response.send({
+            response.status(401).send({
                 result: null,
                 error: true,
                 message: "Invalid username or password"
