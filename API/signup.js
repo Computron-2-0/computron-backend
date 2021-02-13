@@ -44,7 +44,7 @@ server.post("/", async(request, response) => {
             client.close();
         } else {
             //Return error if user is already found.
-            response.send({
+            response.status(409).send({
                 result: null,
                 error: true,
                 message: "User " + request.body.username + " already exists!"
