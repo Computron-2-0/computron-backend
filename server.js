@@ -12,6 +12,7 @@ var port = process.env.PORT || 3000;
 
 const signin = require("./API/signin");
 const signup = require("./API/signup");
+const findlevels = require("./API/findlevels");
 
 server.listen(port, async() => {
   try {
@@ -23,3 +24,4 @@ server.listen(port, async() => {
 
 server.use("/signin", signin);
 server.use("/signup", signup);
+server.use("/findlevels", findlevels);
