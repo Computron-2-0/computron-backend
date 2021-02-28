@@ -14,7 +14,7 @@ server.post("/", async(request, response) => {
         }).toArray();
         if (result == null) {
             response.send({
-                result: null,
+                result: [],
                 error: true,
                 message: "No levels found"
             });
