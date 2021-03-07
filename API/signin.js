@@ -1,6 +1,7 @@
 const Express = require("express");
 const server = Express.Router();
 const { MongoClient } = require("mongodb");
+const Crypto = require("crypto");
 
 server.post("/", async(request, response) => {
     const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
@@ -10,8 +11,7 @@ server.post("/", async(request, response) => {
 
         console.log(request.body);
         var result = await collection.findOne({
-            "user": request.body.username,
-            "pass": request.body.password
+            "user": request.body.username
         });
         if (result == null) {
             response.status(401).send({
@@ -20,21 +20,32 @@ server.post("/", async(request, response) => {
                 message: "Invalid username or password"
             });
         } else {
-            //Update last login date with current date before sending return result.
-            var date = new Date(Date.now());
-            var updateLoginDate = await collection.updateOne({
-            "_id": result._id
-            }, {
-                "$set": {
-                    "last_login_date": date.toJSON()
-                }
-            });
-            console.log("Return data:\n" + JSON.stringify(result));
-            response.send({
-                result: result,
-                error: false,
-                message: "Welcome back, " + result.user + "!"
-            });
+            //Verify password.
+            var password = Crypto.createHash("sha256").update(request.body.password + result.salt).digest();
+            console.log("Comparing " + password.toString("base64") + " with " + result.pass.toString("base64"));
+            if (password.toString() == result.pass.toString()) {
+                //Update last login date with current date before sending return result.
+                var date = new Date(Date.now());
+                var updateLoginDate = await collection.updateOne({
+                    "_id": result._id
+                }, {
+                    "$set": {
+                        "last_login_date": date.toJSON()
+                    }
+                });
+                console.log("Return data:\n" + JSON.stringify(result));
+                response.send({
+                    result: result,
+                    error: false,
+                    message: "Welcome back, " + result.user + "!"
+                });
+            } else {
+                response.status(401).send({
+                    result: null,
+                    error: true,
+                    message: "Invalid username or password"
+                });
+            }
         }
 
         client.close();
