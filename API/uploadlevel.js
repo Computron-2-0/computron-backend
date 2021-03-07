@@ -20,7 +20,7 @@ server.post("/", async(request, response) => {
             "description": level.description,
             "generate_random_inputs": level.generate_random_inputs,
             "inputs": level.inputs,
-            "num_inputs": level.num_inputs,
+            "num_random_inputs": level.num_random_inputs,
             "instructions": level.instructions,
             "cards": level.cards,
             "hints": level.hints,
