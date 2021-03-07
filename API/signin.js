@@ -22,7 +22,6 @@ server.post("/", async(request, response) => {
         } else {
             //Verify password.
             var password = Crypto.createHash("sha256").update(request.body.password + result.salt).digest();
-            console.log("Comparing " + password.toString("base64") + " with " + result.pass.toString("base64"));
             if (password.toString() == result.pass.toString()) {
                 //Update last login date with current date before sending return result.
                 var date = new Date(Date.now());
