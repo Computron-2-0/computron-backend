@@ -1,6 +1,6 @@
 const Express = require("express");
 const server = Express.Router();
-const { MongoClient } = require("mongodb");
+const { MongoClient , ObjectID} = require("mongodb");
 const Crypto = require("crypto");
 
 server.post("/", async(request, response) => {
@@ -9,40 +9,42 @@ server.post("/", async(request, response) => {
         await client.connect();
         var collection = client.db("computron").collection("users");
 
-        console.log("Signing in for user " + request.body.username);
         var result = await collection.findOne({
-            "user": request.body.username
+            "_id": new ObjectID(request.body.userid)
         });
         if (result == null) {
-            response.status(401).send({
+            response.status(500).send({
                 result: null,
                 error: true,
-                message: "Invalid username or password"
+                message: "User no longer exists."
             });
         } else {
             //Verify password.
-            var password = Crypto.createHash("sha256").update(request.body.password + result.salt).digest();
+            var password = Crypto.createHash("sha256").update(request.body.oldpassword + result.salt).digest();
             if (password.toString() == result.pass.toString()) {
-                //Update last login date with current date before sending return result.
-                var date = new Date(Date.now());
-                var updateLoginDate = await collection.updateOne({
+                //Change the password.
+                var salt = Crypto.randomBytes(Crypto.randomInt(32, 64)).toString("base64");
+                password = Crypto.createHash("sha256").update(request.body.newpassword + salt).digest();
+
+                var updatePassword = await collection.updateOne({
                     "_id": result._id
                 }, {
                     "$set": {
-                        "last_login_date": date.toJSON()
+                        "pass": password,
+                        "salt": salt
                     }
                 });
-                console.log("Return data:\n" + JSON.stringify(result));
+
                 response.send({
-                    result: result,
+                    result: updatePassword,
                     error: false,
-                    message: "Welcome back, " + result.user + "!"
+                    message: "Password has been changed."
                 });
             } else {
                 response.status(401).send({
                     result: null,
                     error: true,
-                    message: "Invalid username or password"
+                    message: "Password is incorrect"
                 });
             }
         }

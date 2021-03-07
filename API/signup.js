@@ -1,14 +1,17 @@
 const Express = require("express");
 const server = Express.Router();
 const { MongoClient } = require("mongodb");
+const Crypto = require("crypto");
 
 server.post("/", async(request, response) => {
     const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
     try {
         await client.connect();
         var collection = client.db("computron").collection("users");
+        var salt = Crypto.randomBytes(Crypto.randomInt(32, 64)).toString("base64");
+        var password = Crypto.createHash("sha256").update(request.body.password + salt).digest();
 
-        console.log(request.body);
+        console.log("Creating user " + request.body.username);
         var checkUser = await collection.findOne({
             "user": request.body.username
         });
@@ -17,7 +20,8 @@ server.post("/", async(request, response) => {
             var date = new Date(Date.now());
             var insertResult = await collection.insertOne({
                 "user": request.body.username,
-                "pass": request.body.password,
+                "pass": password,
+                "salt": salt,
                 "email": request.body.email,
                 "date_created": date.toJSON(),
                 "last_login_date": date.toJSON()
