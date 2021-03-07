@@ -11,7 +11,7 @@ server.post("/", async(request, response) => {
         var salt = Crypto.randomBytes(Crypto.randomInt(32, 64)).toString("base64");
         var password = Crypto.createHash("sha256").update(request.body.password + salt).digest();
 
-        console.log(request.body);
+        console.log("Creating user " + request.body.username);
         var checkUser = await collection.findOne({
             "user": request.body.username
         });

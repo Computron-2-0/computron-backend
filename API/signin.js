@@ -9,7 +9,7 @@ server.post("/", async(request, response) => {
         await client.connect();
         var collection = client.db("computron").collection("users");
 
-        console.log(request.body);
+        console.log("Signing in for user " + request.body.username);
         var result = await collection.findOne({
             "user": request.body.username
         });
