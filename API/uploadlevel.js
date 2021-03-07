@@ -1,6 +1,6 @@
 const Express = require("express");
 const server = Express.Router();
-const { MongoClient, ObjectID } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 server.post("/", async(request, response) => {
     const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
@@ -14,7 +14,7 @@ server.post("/", async(request, response) => {
         var level = JSON.parse(request.body.level);
         console.log(level);
         var insertResult = await collection.insertOne({
-            "userid": level.userid,
+            "userid": new ObjectId(level.userid),
             "share_date": date.toJSON(),
             "name": level.name,
             "description": level.description,

@@ -1,6 +1,6 @@
 const Express = require("express");
 const server = Express.Router();
-const { MongoClient, ObjectID } = require("mongodb");
+const { MongoClient } = require("mongodb");
 
 server.post("/", async(request, response) => {
     const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
