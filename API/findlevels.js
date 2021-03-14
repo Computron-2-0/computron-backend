@@ -1,6 +1,6 @@
 const Express = require("express");
 const server = Express.Router();
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectID, ObjectId } = require("mongodb");
 
 server.post("/", async(request, response) => {
     const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
@@ -9,9 +9,32 @@ server.post("/", async(request, response) => {
         var collection = client.db("computron").collection("levels");
 
         console.log(request.body);
-        var result = await collection.find({
-            
-        }).toArray();
+        var payload = JSON.parse(request.body.filter);
+        var filter;
+        switch (payload.searchType) {
+            //Search by ID
+            case 0:
+                filter = {
+                    "_id": new ObjectId((payload._id))
+                };
+                break;
+            //Search by UserID
+            case 1:
+                filter = {
+                    "userid": new ObjectID(payload.userid)
+                };
+                break;
+            //Search by Level Name
+            case 2:
+                filter = {
+                    "name": {
+                        $regex: payload.name,
+                        $options: "i"
+                    }
+                };
+                break;
+        }
+        var result = await collection.find(filter).toArray();
         if (result == null) {
             response.send({
                 result: [],

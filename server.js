@@ -14,6 +14,7 @@ const signin = require("./API/signin");
 const signup = require("./API/signup");
 const findlevels = require("./API/findlevels");
 const uploadlevel = require("./API/uploadlevel");
+const deletelevel = require("./API/deletelevel");
 const changepassword = require("./API/changepassword");
 
 server.listen(port, async() => {
@@ -28,4 +29,5 @@ server.use("/signin", signin);
 server.use("/signup", signup);
 server.use("/findlevels", findlevels);
 server.use("/uploadlevel", uploadlevel);
+server.use("/deletelevel", deletelevel);
 server.use("/changepassword", changepassword);
