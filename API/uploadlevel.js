@@ -15,6 +15,7 @@ server.post("/", async(request, response) => {
         console.log(level);
         var insertResult = await collection.insertOne({
             "userid": new ObjectId(level.userid),
+            "author": request.body.author,
             "share_date": date.toJSON(),
             "name": level.name,
             "description": level.description,

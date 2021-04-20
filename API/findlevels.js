@@ -1,6 +1,6 @@
 const Express = require("express");
 const server = Express.Router();
-const { MongoClient, ObjectID, ObjectId } = require("mongodb");
+const { MongoClient, ObjectID} = require("mongodb");
 
 server.post("/", async(request, response) => {
     const client = new MongoClient(process.env.ATLAS_URI, { useUnifiedTopology: true });
@@ -11,29 +11,57 @@ server.post("/", async(request, response) => {
         console.log(request.body);
         var payload = JSON.parse(request.body.filter);
         var filter;
-        switch (payload.searchType) {
-            //Search by ID
-            case 0:
-                filter = {
-                    "_id": new ObjectId((payload._id))
-                };
-                break;
-            //Search by UserID
-            case 1:
-                filter = {
-                    "userid": new ObjectID(payload.userid)
-                };
-                break;
-            //Search by Level Name
-            case 2:
-                filter = {
-                    "name": {
-                        $regex: payload.name,
-                        $options: "i"
-                    }
-                };
-                break;
+
+        if (payload._id != "") {
+            filter = {
+                "_id": new ObjectID(payload._id)
+            };
         }
+        else {
+            filter = {
+                "name": {
+                    $regex: payload.name,
+                    $options: "i"
+                }
+            };
+            if (payload.author != "")
+                filter.author = {
+                    $regex: payload.author,
+                    $options: "i"
+                };
+        }
+
+        var todaysDate = new Date(Date.now());
+        var dateRange;
+        switch (payload.date_range) {
+            //within 14 days
+            case 0:
+                dateRange = getMillisFromDays(14);
+                break;
+            //within 30 days
+            case 1:
+                dateRange = getMillisFromDays(30);
+                break;
+            //within 90 days
+            case 2:
+                dateRange = getMillisFromDays(90);
+                break;
+            //within 180 days
+            case 3:
+                dateRange = getMillisFromDays(180);
+                break;
+            //default fetch all
+            default:
+                dateRange = null;
+        }
+        if (dateRange != null) {
+            var searchDateFrom = new Date(todaysDate.valueOf() - dateRange);
+            console.log("Searching levels from " + searchDateFrom);
+            filter.share_date = {
+                $gte: searchDateFrom.toISOString()
+            }
+        }
+
         var result = await collection.find(filter).toArray();
         if (result == null) {
             response.send({
@@ -60,5 +88,10 @@ server.post("/", async(request, response) => {
         });
     }
 });
+
+function getMillisFromDays(days) {
+    //Number of days * 24 hours/day * 60 minutes/hour * 60 seconds/minute * 1000 milliseconds/second
+    return days * 24 * 60 * 60 * 1000;
+}
 
 module.exports = server;
