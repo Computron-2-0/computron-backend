@@ -29,38 +29,41 @@ server.post("/", async(request, response) => {
                     $regex: payload.author,
                     $options: "i"
                 };
-        }
-
-        var todaysDate = new Date(Date.now());
-        var dateRange;
-        switch (payload.date_range) {
-            //within 14 days
-            case 0:
-                dateRange = getMillisFromDays(14);
-                break;
-            //within 30 days
-            case 1:
-                dateRange = getMillisFromDays(30);
-                break;
-            //within 90 days
-            case 2:
-                dateRange = getMillisFromDays(90);
-                break;
-            //within 180 days
-            case 3:
-                dateRange = getMillisFromDays(180);
-                break;
-            //default fetch all
-            default:
-                dateRange = null;
-        }
-        if (dateRange != null) {
-            var searchDateFrom = new Date(todaysDate.valueOf() - dateRange);
-            console.log("Searching levels from " + searchDateFrom);
-            filter.share_date = {
-                $gte: searchDateFrom.toISOString()
+            
+            var todaysDate = new Date(Date.now());
+            var dateRange;
+            switch (payload.date_range) {
+                //within 14 days
+                case 0:
+                    dateRange = getMillisFromDays(14);
+                    break;
+                //within 30 days
+                case 1:
+                    dateRange = getMillisFromDays(30);
+                    break;
+                //within 90 days
+                case 2:
+                    dateRange = getMillisFromDays(90);
+                    break;
+                //within 180 days
+                case 3:
+                    dateRange = getMillisFromDays(180);
+                    break;
+                //default fetch all
+                default:
+                    dateRange = null;
+            }
+            if (dateRange != null) {
+                var searchDateFrom = new Date(todaysDate.valueOf() - dateRange);
+                console.log("Searching levels from " + searchDateFrom);
+                filter.share_date = {
+                    $gte: searchDateFrom.toISOString()
+                }
             }
         }
+
+        console.log("Searching with filters: ");
+        console.log(filter);
 
         var result = await collection.find(filter).toArray();
         if (result == null) {
